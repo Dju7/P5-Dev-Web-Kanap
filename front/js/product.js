@@ -1,5 +1,9 @@
+//Stockage de la valeur de l'ID produit
 const urlId = new URLSearchParams (window.location.search).get("id");
-
+//Condition si UrlSearchParams ne renvoie aucune ID - Retour à la page D'accueil
+if (!urlId) {
+    window.location.href = "./index.html";
+} else {
 //Récupération du produit dans l'API
 fetch(`http://localhost:3000/api/products/${urlId}`)
 .then(response => response.json())
@@ -23,14 +27,35 @@ productGet.colors.forEach(color => {
 });
 
 // Bouton Ajout Panier
-const buttonBasket = document.querySelector("#addToCart");
-buttonBasket.addEventListener("click", () => {
+const btnBasket = document.querySelector("#addToCart");
+btnBasket.addEventListener("click", () => {
     const addProduct = {
         quantity: document.querySelector("#quantity"),
         color: document.querySelector("#colors"),
-        id: urlId
+        id: urlId    
     };
+    console.log(addProduct);
+  
+
+let cart = localStorage.getItem('cart');
+
+if (cart === null) {
+    cart =  [];
+} else  {
+    cart = JSON.parse(cart);
+}
+
+const productExist = cart.find(item => item.quantity === addProduct.quantity && item.color === addProduct.color);
+if (productExist) {
+    return cart;
+} else {
+    cart.push(addProduct)
+    localStorage.setItem("cart", JSON.stringify(cart))
+    return cart;
+}
+
 });
 
-})
+}) 
 .catch(error =>console.error(error));
+}
