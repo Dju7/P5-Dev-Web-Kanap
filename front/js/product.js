@@ -30,11 +30,18 @@ productGet.colors.forEach(color => {
 const btnBasket = document.querySelector("#addToCart");
 btnBasket.addEventListener("click", () => {
     const addProduct = {
-        quantity: document.querySelector("#quantity"),
-        color: document.querySelector("#colors"),
+        quantity: document.querySelector("#quantity").value,
+        color: document.querySelector("#colors").value,
         id: urlId    
     };
     console.log(addProduct);
+
+    /* ------------------------------------------------------------------------------------------------------------------------------------
+
+    Pourquoi pas ajouter ici une fonction qui contrôlerait que l'utilisateur à bien choisit une couleur et une quantité et qui l'informerait, 
+    dans le cas contraire, du produit qu'il vient d'ajouter au panier ?
+
+    -------------------------------------------------------------------------------------------------------------------------------------- */
   
 
 let cart = localStorage.getItem('cart');
@@ -47,10 +54,11 @@ if (cart === null) {
 
 const productExist = cart.find(item => item.quantity === addProduct.quantity && item.color === addProduct.color);
 if (productExist) {
-    return cart;
+    const index = cart.indexOf(productExist);
+    cart[index].quantity += addProduct.quantity;
 } else {
     cart.push(addProduct)
-    localStorage.setItem("cart", JSON.stringify(cart))
+    localStorage.setItem("cart", JSON.stringify(cart));
     return cart;
 }
 
