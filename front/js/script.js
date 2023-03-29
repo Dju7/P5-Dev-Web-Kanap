@@ -3,8 +3,7 @@
  // Retourner sous forme Json
  .then(response => response.json())
  // stockage des données dans la variable products
- .then(data => {
-   const products = data;
+ .then(products => {
  // déclaration de la section items qui recevra les articles
    const sectionItems = document.querySelector('.items');
 
