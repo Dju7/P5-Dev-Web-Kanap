@@ -75,13 +75,13 @@ function createCart(cartWithProductData){
 
 const cart = JSON.parse(localStorage.getItem("cart"));
 console.log(cart);
+
 // promise all
 if (cart) {
   const productIdFromApi = cart.map(product =>
     fetch(`http://localhost:3000/api/products/${product.id}`)
       .then(response => response.json())
   );
-
   Promise.all(productIdFromApi)
     .then(products => {
       const cartWithProductData = cart.map((product, index) => {
