@@ -83,7 +83,7 @@ btnBasket.addEventListener("click", () => {
     };
   console.log(addProduct);
   
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const productExist = cart.find(item => item.id === addProduct.id && item.color === addProduct.color);
 if (productExist) {
     const index = cart.indexOf(productExist);
