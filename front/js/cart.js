@@ -75,7 +75,7 @@ function createCart(cartWithProductData){
 
 let cart = JSON.parse(localStorage.getItem("cart"));
 console.log(cart);
-let sectionCartItem;
+let cartWithProductData = [];
 
 // promise all
 if (cart) {
@@ -131,16 +131,49 @@ function modifQuantity() {
       let color = article.dataset.color;
       let quantityChange = cart.find(item => item.id === id && item.color === color);
       quantityChange.quantity = parseInt(value);
-      console.log(quantityChange);
 
       if (quantityChange != cart.quantity) {
         cart.splice(0, 1, quantityChange)
         localStorage.setItem('cart', JSON.stringify(cart)); 
+        document.location.reload();
       }
     })  
   })
 }
 
+/*
 // --------------------- afficher la quantité d'article total et le prix total ---------------------
 
+// --------------- Quantité d'article ------------------
 
+let totalProduct = [];
+let add;
+
+for(let qty = 0; qty < cart.lenght; qty++ ) {
+  let totalOfProduct = cart.quantity;
+  totalProduct.psuch(totalOfProduct);
+  add += totalOfProduct[i]
+}
+
+console.log(cart.quantity);
+
+// ---------- Prix total ---------------
+
+let prixTotal = [];
+
+// récupération de tout les prix des produits dans le panier
+
+for (let i = 0; i < cartWithProductData.length; i++) {
+  let priceFromBasket = cartWithProductData.price;
+  prixTotal.push(priceFromBasket);  
+}
+
+// Somme des prix
+
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+const priceSum = prixTotal.reduce(reducer);
+
+// affichage du prix Total
+
+const displayPriceTotal = document.querySelector("#totalPrice").innerHTML= `${prixTotal}`;
+*/
