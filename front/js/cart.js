@@ -109,12 +109,12 @@ function deleteProduct(){
     let id = article.dataset.id;
     let color = article.dataset.color;
     // Supprimer le produit du panier
-    cart = cart.filter(item => item.id !== id || item.color !== color);
+    cart = cart.filter(item => !(item.id === id && item.color === color));
     // Mettre à jour le panier dans le stockage local
     localStorage.setItem('cart', JSON.stringify(cart));
     // Retirer l'article du DOM
     article.remove();
-    window.location.href = "./cart.html";
+    document.location.reload();
   });
 });
 }
@@ -147,7 +147,7 @@ function modifQuantity() {
 // --------------- Quantité d'article ------------------
 
 let totalProduct = [];
-let add;
+let add = 0;
 
 for(let qty = 0; qty < cart.lenght; qty++ ) {
   let totalOfProduct = cart.quantity;
@@ -171,9 +171,9 @@ for (let i = 0; i < cartWithProductData.length; i++) {
 // Somme des prix
 
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
-const priceSum = prixTotal.reduce(reducer);
+const totalAmount = prixTotal.reduce(reducer);
 
 // affichage du prix Total
 
-const displayPriceTotal = document.querySelector("#totalPrice").innerHTML= `${prixTotal}`;
+const displayPriceTotal = document.querySelector("#totalPrice").innerHTML= `${totalAmount}`;
 */
