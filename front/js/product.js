@@ -90,6 +90,7 @@ if (productExist) {
     cart[index].quantity += addProduct.quantity;
 } else {
     cart.push(addProduct);
+    alert("produit ajouter au panier");
 }
 localStorage.setItem("cart", JSON.stringify(cart));  
   }
