@@ -71,31 +71,42 @@ function createCart(cartWithProductData){
   })
 }
 
-// ----------------- Récupération donnée du LocalStorage + API + fusion --------------------------
 
-let cart = JSON.parse(localStorage.getItem("cart"));
-console.log(cart);
-let cartWithProductData = [];
+// ----------------- Récupération donnée et appel des fonctions --------------------------
 
-// promise all
-if (cart) {
+let cart;
+let cartWithProductData; 
+
+function updateCart() {
+  cart = JSON.parse(localStorage.getItem("cart"));
+  console.log(cart);
+
+  if (!cart) {
+    const sectionCartItem = document.querySelector("#cart__items");
+    sectionCartItem.innerHTML = `<h2>Le panier est vide.</h2>`;
+    return;
+  }
+
   const productIdFromApi = cart.map(product =>
     fetch(`http://localhost:3000/api/products/${product.id}`)
       .then(response => response.json())
   );
   Promise.all(productIdFromApi)
     .then(products => {
-      let cartWithProductData = cart.map((product, index) => {
+      cartWithProductData = cart.map((product, index) => {
         return Object.assign({}, product, products[index]);
       });
       console.log(cartWithProductData);
+
       createCart(cartWithProductData);
       deleteProduct();
       modifQuantity();
-    });
-} else {
-  const sectionCartItem = document.querySelector("#cart__items").innerHTML = `<h2>il n'y a pas de produit dans le panier</h2>`
+      displayTotalQuantityAndPrice()
+    })
+    .catch(error => console.error(error));
 }
+
+updateCart();
 
 // ----------------------- Ajout et / ou suppression de produit -------------------------
 
@@ -140,40 +151,38 @@ function modifQuantity() {
     })  
   })
 }
+// ----------------------- gestion de l'affichage de la quantité et du prix total --------------
+ 
+function displayTotalQuantityAndPrice() {
 
-/*
-// --------------------- afficher la quantité d'article total et le prix total ---------------------
+  // Calcul de la quantité totale d'articles
+  let totalProduct = [];
+  let totalArticle = 0;
 
-// --------------- Quantité d'article ------------------
+  for(let i = 0; i < cart.length; i++ ) {
+    let totalOfProduct = parseInt(cart[i].quantity);
+    totalProduct.push(totalOfProduct);
+    totalArticle += totalProduct[i]
+  }
 
-let totalProduct = [];
-let add = 0;
+  // Affichage de la quantité totale d'articles
+  const displayPTotalArticle = document.querySelector("#totalQuantity").innerHTML= `${totalArticle}`;
 
-for(let qty = 0; qty < cart.lenght; qty++ ) {
-  let totalOfProduct = cart.quantity;
-  totalProduct.psuch(totalOfProduct);
-  add += totalOfProduct[i]
+  // Calcul du prix total
+  let prixTotal = [];
+  let qtyProduct = 0;
+
+  // Récupération de tous les prix des produits dans le panier
+  for (let i = 0; i < cartWithProductData.length; i++) {
+    let priceFromBasket = parseInt(cartWithProductData[i].price);
+    qtyProduct += parseInt(cartWithProductData[i].quantity);
+    prixTotal.push(priceFromBasket);  
+  }
+
+  // Somme des prix
+  const reducer = (accumulator, currentValue) => accumulator + currentValue;
+  const totalAmount = prixTotal.reduce(reducer) * qtyProduct ;
+
+  // Affichage du prix total
+  const displayPriceTotal = document.querySelector("#totalPrice").innerHTML= `${totalAmount} €`;
 }
-
-console.log(cart.quantity);
-
-// ---------- Prix total ---------------
-
-let prixTotal = [];
-
-// récupération de tout les prix des produits dans le panier
-
-for (let i = 0; i < cartWithProductData.length; i++) {
-  let priceFromBasket = cartWithProductData.price;
-  prixTotal.push(priceFromBasket);  
-}
-
-// Somme des prix
-
-const reducer = (accumulator, currentValue) => accumulator + currentValue;
-const totalAmount = prixTotal.reduce(reducer);
-
-// affichage du prix Total
-
-const displayPriceTotal = document.querySelector("#totalPrice").innerHTML= `${totalAmount}`;
-*/
