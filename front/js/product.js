@@ -18,6 +18,7 @@ function displayProduct(product) {
  imgElementProd.src = product.imageUrl;
  imgElementProd.alt = product.altTxt;
  sectionItemImg.appendChild(imgElementProd);
+ 
  // affichage nom, prix, description
  document.querySelector("#title").textContent= product.name;
  document.querySelector("#price").textContent= product.price;

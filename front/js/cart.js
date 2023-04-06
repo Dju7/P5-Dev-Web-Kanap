@@ -1,10 +1,44 @@
-// ---------Affichage des produits dans le panier ---------------------
+// ------------------------ RECUPERATION DES DONNEES ET APPEL DES FONCTIONS -----------------------------
+
+let cart;
+// Récupération des produits dans le localStorage
+function updateCart() {
+  cart = JSON.parse(localStorage.getItem("cart"));
+  
+  if (!cart || cart.length === 0) {
+    const sectionCartItem = document.querySelector("#cart__items");
+    sectionCartItem.innerHTML = `<h2>Le panier est vide.</h2>`;
+    return;
+  }
+
+// Appel API et fusion des données dans cart
+
+  const productIdFromApi = cart.map(product =>
+    fetch(`http://localhost:3000/api/products/${product.id}`)
+      .then(response => response.json())
+  );
+  Promise.all(productIdFromApi)
+    .then(products => {
+      cart = cart.map((product, index) => {
+        return Object.assign({}, product, products[index]);
+      });
+      createCartElement(cart);
+      btnTodeleteProduct();
+      modifQuantityFromInput();
+      displayTotalQuantityAndPrice()
+    })
+    .catch(error => console.error(error));
+}
+
+updateCart();
+
+// --------------------------- AFFICHAGE DES PRODUITS DANS LE PANIER ----------------------------------
 
 function createCartElement(cart) {
   //Récupération DIV panier
   const sectionCartItem = document.querySelector("#cart__items");
 
-  //Boucle pour récupérer produit ajouter dans le panier et stockés dans cart
+  //Boucle pour récupérer produits ajoutés dans le panier et stockés dans cart
   cart.forEach(product => {
     sectionCartItem.innerHTML +=
       `<article class="cart__item" data-id=${product.id} data-color=${product.color}>
@@ -32,39 +66,7 @@ function createCartElement(cart) {
   })
 }
 
-// ----------------- Récupération donnée et appel des fonctions --------------------------
-
-let cart;
-
-function updateCart() {
-  cart = JSON.parse(localStorage.getItem("cart"));
-  
-  if (!cart || cart.length === 0) {
-    const sectionCartItem = document.querySelector("#cart__items");
-    sectionCartItem.innerHTML = `<h2>Le panier est vide.</h2>`;
-    return;
-  }
-
-  const productIdFromApi = cart.map(product =>
-    fetch(`http://localhost:3000/api/products/${product.id}`)
-      .then(response => response.json())
-  );
-  Promise.all(productIdFromApi)
-    .then(products => {
-      cart = cart.map((product, index) => {
-        return Object.assign({}, product, products[index]);
-      });
-      createCartElement(cart);
-      btnTodeleteProduct();
-      modifQuantityFromInput();
-      displayTotalQuantityAndPrice()
-    })
-    .catch(error => console.error(error));
-}
-
-updateCart();
-
-// -----------------------  suppression de produit -------------------------
+// ---------------------------------  SUPPRESSION DES PRODUITS -------------------------------------
 
 function btnTodeleteProduct(){
   const deleteButton = document.querySelectorAll('.deleteItem');
@@ -86,7 +88,7 @@ function btnTodeleteProduct(){
 });
 }
 
-// ----------------- Modifier quantité de produit dans le panier ----------------------
+// ------------------------------------ MODIFIER QUANTITE DES PRODUITS ---------------------------------
 
 function modifQuantityFromInput() {
   const inputQuantity = document.querySelectorAll(".itemQuantity");
@@ -103,7 +105,7 @@ function modifQuantityFromInput() {
     })  
   })
 }
-// ----------------------- affichage de la quantité et du prix total --------------
+// ------------------------------------------ AFFICHAGE QUANTITE ET PRIX TOTAL -----------------------------
  
 function displayTotalQuantityAndPrice() {
 
@@ -121,7 +123,7 @@ function displayTotalQuantityAndPrice() {
   document.querySelector("#totalPrice").innerHTML= `${totalPrice}`;
 }
 
-// --- FORMULAIRE DE COMMANDE ---
+// --------------------------------------- FORMULAIRE DE COMMANDE ------------------------------------------
 
 // Variable champs de saisie
 
@@ -190,8 +192,9 @@ form.addEventListener('submit', function(e) {
   }
 });
 
-// --- PASSER COMMANDE ---
+// --------------------------------------- PASSER COMMANDE -----------------------------------------------------
 
+// Création du contenu de la commande
 function createOrder() {
   let basketContents = [];
   for (let n = 0; n < cart.length; n++) {
@@ -210,13 +213,13 @@ function createOrder() {
   };
 }
 
-// Click sur le bouton commande - requête POST au back-end
+// Click sur le bouton commande - requête Back-end
 
 const btnToOrder = document.querySelector("#order");
 btnToOrder.addEventListener("click", (e) => {
   e.preventDefault();
   
-  if (!cart || cart === null) {
+  if (!cart || cart.length === 0) {
     alert("Vous devez ajouter des produits dans votre panier");
   } else {
     const order = createOrder();
@@ -236,7 +239,6 @@ btnToOrder.addEventListener("click", (e) => {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       alert("Commande passée avec succès !");
       // Redirection de l'utilisateur vers la page de confirmation de commande
       window.location.href = `./confirmation.html?id=${data.orderId}`;
