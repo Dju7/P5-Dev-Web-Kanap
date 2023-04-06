@@ -1,35 +1,35 @@
 // ---------Affichage des produits dans le panier ---------------------
 
-function createCartElement(cart){
-//Récupération DIV panier
+function createCartElement(cart) {
+  //Récupération DIV panier
   const sectionCartItem = document.querySelector("#cart__items");
-  
-//Boucle pour récupérer produit ajouter dans le panier et stockés dans cart
-  cart.forEach(product => {
-     sectionCartItem.innerHTML +=
-  `<article class="cart__item" data-id=${product.id} data-color=${product.color}>
-  <div class="cart__item__img">
-    <img src=${product.imageUrl} alt=${product.altTxt}>
-  </div>
-  <div class="cart__item__content">
-    <div class="cart__item__content__description">
-      <h2>${product.name}</h2>
-      <p>${product.color}</p>
-      <p>${product.price}</p>
-    </div>
-    <div class="cart__item__content__settings">
-      <div class="cart__item__content__settings__quantity">
-        <p>Qté : </p>
-        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${product.quantity}>
-      </div>
-      <div class="cart__item__content__settings__delete">
-        <p class="deleteItem">Supprimer</p>
-      </div>
-    </div>
-  </div>
-</article>` 
 
-  }) 
+  //Boucle pour récupérer produit ajouter dans le panier et stockés dans cart
+  cart.forEach(product => {
+    sectionCartItem.innerHTML +=
+      `<article class="cart__item" data-id=${product.id} data-color=${product.color}>
+        <div class="cart__item__img">
+          <img src=${product.imageUrl} alt=${product.altTxt}>
+        </div>
+        <div class="cart__item__content">
+          <div class="cart__item__content__description">
+            <h2>${product.name}</h2>
+            <p>${product.color}</p>
+            <p>${product.price}</p>
+          </div>
+          <div class="cart__item__content__settings">
+            <div class="cart__item__content__settings__quantity">
+              <p>Qté : </p>
+              <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${product.quantity}>
+            </div>
+            <div class="cart__item__content__settings__delete">
+              <p class="deleteItem">Supprimer</p>
+            </div>
+          </div>
+        </div>
+      </article>`
+
+  })
 }
 
 // ----------------- Récupération donnée et appel des fonctions --------------------------
@@ -64,7 +64,7 @@ function updateCart() {
 
 updateCart();
 
-// ----------------------- Ajout et / ou suppression de produit -------------------------
+// -----------------------  suppression de produit -------------------------
 
 function btnTodeleteProduct(){
   const deleteButton = document.querySelectorAll('.deleteItem');
@@ -86,7 +86,7 @@ function btnTodeleteProduct(){
 });
 }
 
-// ----------------- Gérer le changement de quantité depuis le panier ----------------------
+// ----------------- Modifier quantité de produit dans le panier ----------------------
 
 function modifQuantityFromInput() {
   const inputQuantity = document.querySelectorAll(".itemQuantity");
@@ -153,15 +153,15 @@ lastName.addEventListener('input', function() {
   if (!nameRegExp.test(lastName.value)) {
     document.querySelector("#lastNameErrorMsg").textContent = "Veuillez saisir un nom valide";
   } else {
-    document.querySelector("#lasttNameErrorMsg").textContent = "";
+    document.querySelector("#lastNameErrorMsg").textContent = "";
   }
 });
 
 address.addEventListener('input', function() {
   if (!addressRegExp.test(address.value)) {
-    document.querySelector("#adressErrorMsg").textContent = "Veuillez saisir une adresse valide";
+    document.querySelector("#addressErrorMsg").textContent = "Veuillez saisir une adresse valide";
   } else {
-    document.querySelector("#adressErrorMsg").textContent = "";
+    document.querySelector("#addressErrorMsg").textContent = "";
   }
 });
 
@@ -197,20 +197,20 @@ function createOrder() {
   for (let n = 0; n < cart.length; n++) {
     basketContents.push(cart[n].id);
   }
-
+  
   return {
-    clientInfo : {
-      Firstname : firstName.value,
-      Lastname : lastName.value,
-      Adresse : address.value,
-      City : city.value,
-      Email : email.value,
+    contact : {
+      firstName : firstName.value,
+      lastName : lastName.value,
+      address : address.value,
+      city : city.value,
+      email : email.value,
     },
-    Ordered : basketContents
+      products : basketContents
   };
 }
 
-// Click sur le bouton commande
+// Click sur le bouton commande - requête POST au back-end
 
 const btnToOrder = document.querySelector("#order");
 btnToOrder.addEventListener("click", (e) => {
@@ -219,8 +219,8 @@ btnToOrder.addEventListener("click", (e) => {
   if (!cart || cart === null) {
     alert("Vous devez ajouter des produits dans votre panier");
   } else {
-    const order = createOrder ()
-
+    const order = createOrder();
+    console.log(order)
     fetch("http://localhost:3000/api/products/order", {
       method: 'POST',
       body: JSON.stringify(order),
@@ -236,10 +236,10 @@ btnToOrder.addEventListener("click", (e) => {
       return response.json();
     })
     .then((data) => {
-      order = data;
+      console.log(data);
       alert("Commande passée avec succès !");
       // Redirection de l'utilisateur vers la page de confirmation de commande
-      window.location.href = "./confirmation.html";
+      window.location.href = `./confirmation.html?id=${data.orderId}`;
     })
     .catch((error) => {
       alert(error.message);
