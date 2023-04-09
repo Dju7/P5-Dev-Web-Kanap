@@ -62,7 +62,6 @@ function createCartElement(cart) {
           </div>
         </div>
       </article>`
-
   })
 }
 
@@ -73,10 +72,10 @@ function btnTodeleteProduct(){
   deleteButton.forEach(button => {
   button.addEventListener('click', () => {
     // Récupérer l'element parent dont la class = cart__item
-    let article = button.closest(".cart__item");
+    const article = button.closest(".cart__item");
     // Récupérer l'ID et la couleur du produit à supprimer
-    let id = article.dataset.id;
-    let color = article.dataset.color;
+    const id = article.dataset.id;
+    const color = article.dataset.color;
     // Supprimer le produit du panier
     cart = cart.filter(item => !(item.id === id && item.color === color));
     // Mettre à jour le panier dans le stockage local
@@ -95,10 +94,10 @@ function modifQuantityFromInput() {
   inputQuantity.forEach(itemQ => {
     itemQ.addEventListener('change', (event) => {
       const value = event.target.value;
-      let article = itemQ.closest(".cart__item");
-      let id = article.dataset.id;
-      let color = article.dataset.color;
-      let quantityChange = cart.find(item => item.id === id && item.color === color);
+      const article = itemQ.closest(".cart__item");
+      const id = article.dataset.id;
+      const color = article.dataset.color;
+      const quantityChange = cart.find(item => item.id === id && item.color === color);
       quantityChange.quantity = parseInt(value);
       localStorage.setItem('cart', JSON.stringify(cart)); 
       displayTotalQuantityAndPrice();
