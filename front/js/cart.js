@@ -232,8 +232,8 @@ btnToOrder.addEventListener("click", (e) => {
       },
     })
     .then((response) => {
-      if (!response.ok) {
-        throw new Error("Erreur de commande");
+      if (!response.ok || !form.checkValidity())  {
+        throw new Error("Vous devez remplir le formulaire correctement");
       }
       return response.json();
     })

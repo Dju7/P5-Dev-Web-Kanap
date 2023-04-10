@@ -59,7 +59,7 @@ function validateSelection() {
     const selectQuantity = document.querySelector("#quantity").value;
     const selectColor = document.querySelector("#colors").value;
   
-    if (isNaN(selectQuantity) || selectQuantity < 1 || !Number.isInteger(parseInt(selectQuantity))) {
+    if (isNaN(selectQuantity) || selectQuantity < 1 || !Number.isInteger(parseInt(selectQuantity)) || selectQuantity < 1 || selectQuantity > 100) {
       alert("Vous devez entrer une quantité numérique pour ajouter un produit au panier!");
       return;
     }
@@ -91,7 +91,7 @@ if (productExist) {
     cart[index].quantity += addProduct.quantity;
 } else {
     cart.push(addProduct);
-    alert("produit ajouter au panier");
+    alert("produit(s) ajouté(s) au panier");
 }
 localStorage.setItem("cart", JSON.stringify(cart));  
   }
