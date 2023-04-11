@@ -4,30 +4,31 @@ let cart;
 // Récupération des produits dans le localStorage
 function updateCart() {
   cart = JSON.parse(localStorage.getItem("cart"));
-  
+
   if (!cart || cart.length === 0) {
     const sectionCartItem = document.querySelector("#cart__items");
     sectionCartItem.innerHTML = `<h2>Le panier est vide.</h2>`;
     return;
   }
 
-// Appel API et fusion des données dans cart
+  // Appel API et fusion des données dans cart
 
-  const productIdFromApi = cart.map(product =>
-    fetch(`http://localhost:3000/api/products/${product.id}`)
-      .then(response => response.json())
+  const productIdFromApi = cart.map((product) =>
+    fetch(`http://localhost:3000/api/products/${product.id}`).then((response) =>
+      response.json()
+    )
   );
   Promise.all(productIdFromApi)
-    .then(products => {
+    .then((products) => {
       cart = cart.map((product, index) => {
         return Object.assign({}, product, products[index]);
       });
       createCartElement(cart);
       btnTodeleteProduct();
       modifQuantityFromInput();
-      displayTotalQuantityAndPrice()
+      displayTotalQuantityAndPrice();
     })
-    .catch(error => console.error(error));
+    .catch((error) => console.error(error));
 }
 
 updateCart();
@@ -39,9 +40,8 @@ function createCartElement(cart) {
   const sectionCartItem = document.querySelector("#cart__items");
 
   //Boucle pour récupérer produits ajoutés dans le panier et stockés dans cart
-  cart.forEach(product => {
-    sectionCartItem.innerHTML +=
-      `<article class="cart__item" data-id=${product.id} data-color=${product.color}>
+  cart.forEach((product) => {
+    sectionCartItem.innerHTML += `<article class="cart__item" data-id=${product.id} data-color=${product.color}>
         <div class="cart__item__img">
           <img src=${product.imageUrl} alt=${product.altTxt}>
         </div>
@@ -61,77 +61,73 @@ function createCartElement(cart) {
             </div>
           </div>
         </div>
-      </article>`
-  })
+      </article>`;
+  });
 }
 
 // ---------------------------------  SUPPRESSION DES PRODUITS -------------------------------------
 
-function btnTodeleteProduct(){
-  const deleteButton = document.querySelectorAll('.deleteItem');
-  deleteButton.forEach(button => {
-  button.addEventListener('click', () => {
-    // Récupérer l'element parent dont la class = cart__item
-    const article = button.closest(".cart__item");
-    // Récupérer l'ID et la couleur du produit à supprimer
-    const id = article.dataset.id;
-    const color = article.dataset.color;
-    // Supprimer le produit du panier
-    cart = cart.filter(item => !(item.id === id && item.color === color));
-    // Mettre à jour le panier dans le stockage local
-    localStorage.setItem('cart', JSON.stringify(cart));
-    // Retirer l'article du DOM
-    article.remove();
-    displayTotalQuantityAndPrice();
+function btnTodeleteProduct() {
+  const deleteButton = document.querySelectorAll(".deleteItem");
+  deleteButton.forEach((button) => {
+    button.addEventListener("click", () => {
+      const article = button.closest(".cart__item");
+      const id = article.dataset.id;
+      const color = article.dataset.color;
+      cart = cart.filter((item) => !(item.id === id && item.color === color));
+      localStorage.setItem("cart", JSON.stringify(cart));
+      article.remove();
+      displayTotalQuantityAndPrice();
+    });
   });
-});
 }
 
 // ------------------------------------ MODIFIER QUANTITE DES PRODUITS ---------------------------------
 
 function modifQuantityFromInput() {
   const inputQuantity = document.querySelectorAll(".itemQuantity");
-  inputQuantity.forEach(itemQ => {
-    itemQ.addEventListener('change', (event) => {
+  inputQuantity.forEach((itemQ) => {
+    itemQ.addEventListener("change", (event) => {
       const value = event.target.value;
       const article = itemQ.closest(".cart__item");
       const id = article.dataset.id;
       const color = article.dataset.color;
-      const quantityChange = cart.find(item => item.id === id && item.color === color);
+      const quantityChange = cart.find(
+        (item) => item.id === id && item.color === color
+      );
       quantityChange.quantity = parseInt(value);
-      localStorage.setItem('cart', JSON.stringify(cart)); 
+      localStorage.setItem("cart", JSON.stringify(cart));
       displayTotalQuantityAndPrice();
-    })  
-  })
+    });
+  });
 }
 // ------------------------------------------ AFFICHAGE QUANTITE ET PRIX TOTAL -----------------------------
- 
-function displayTotalQuantityAndPrice() {
 
+function displayTotalQuantityAndPrice() {
   // Calcul de la quantité totale d'articles
   let totalPrice = 0;
   let totalQuantity = 0;
 
-  for(let i = 0; i < cart.length; i++ ) {
-   totalQuantity += cart[i].quantity
-   totalPrice += cart[i].price * cart[i].quantity
+  for (let i = 0; i < cart.length; i++) {
+    totalQuantity += cart[i].quantity;
+    totalPrice += cart[i].price * cart[i].quantity;
   }
-  
+
   // Affichage de la quantité totale d'articles
-  document.querySelector("#totalQuantity").innerHTML= `${totalQuantity}`;
-  document.querySelector("#totalPrice").innerHTML= `${totalPrice}`;
+  document.querySelector("#totalQuantity").innerHTML = `${totalQuantity}`;
+  document.querySelector("#totalPrice").innerHTML = `${totalPrice}`;
 }
 
 // --------------------------------------- FORMULAIRE DE COMMANDE ------------------------------------------
 
 // Variable champs de saisie
 
-const form = document.querySelector('.cart__order__form');
-const firstName = form.querySelector('#firstName');
-const lastName = form.querySelector('#lastName');
-const address = form.querySelector('#address');
-const city = form.querySelector('#city');
-const email = form.querySelector('#email');
+const form = document.querySelector(".cart__order__form");
+const firstName = form.querySelector("#firstName");
+const lastName = form.querySelector("#lastName");
+const address = form.querySelector("#address");
+const city = form.querySelector("#city");
+const email = form.querySelector("#email");
 
 // Variable RegExp
 
@@ -142,108 +138,99 @@ const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Validation champs de saisie et formulaire
 
-firstName.addEventListener('input', function() {
+function validateForm() {
+  let isValid = true;
+
   if (!nameRegExp.test(firstName.value)) {
-    document.querySelector("#firstNameErrorMsg").textContent = "Veuillez saisir un prénom valide";
+    document.querySelector("#firstNameErrorMsg").textContent =
+      "Veuillez saisir un prénom valide";
+    isValid = false;
   } else {
     document.querySelector("#firstNameErrorMsg").textContent = "";
   }
-});
 
-lastName.addEventListener('input', function() {
   if (!nameRegExp.test(lastName.value)) {
-    document.querySelector("#lastNameErrorMsg").textContent = "Veuillez saisir un nom valide";
+    document.querySelector("#lastNameErrorMsg").textContent =
+      "Veuillez saisir un nom valide";
+    isValid = false;
   } else {
     document.querySelector("#lastNameErrorMsg").textContent = "";
   }
-});
 
-address.addEventListener('input', function() {
   if (!addressRegExp.test(address.value)) {
-    document.querySelector("#addressErrorMsg").textContent = "Veuillez saisir une adresse valide";
+    document.querySelector("#addressErrorMsg").textContent =
+      "Veuillez saisir une adresse valide";
+    isValid = false;
   } else {
     document.querySelector("#addressErrorMsg").textContent = "";
   }
-});
 
-city.addEventListener('input', function() {
   if (!cityRegExp.test(city.value)) {
-    document.querySelector("#cityErrorMsg").textContent = "Veuillez saisir une ville valide";
+    document.querySelector("#cityErrorMsg").textContent =
+      "Veuillez saisir une ville valide";
+    isValid = false;
   } else {
     document.querySelector("#cityErrorMsg").textContent = "";
   }
-});
 
-email.addEventListener('input', function() {
   if (!emailRegExp.test(email.value)) {
-    document.querySelector("#emailErrorMsg").textContent = "Veuillez saisir une adresse email valide";
+    document.querySelector("#emailErrorMsg").textContent =
+      "Veuillez saisir une adresse email valide";
+    isValid = false;
   } else {
-    document.querySelector("#emailErrorMsg").textContent = ""; 
+    document.querySelector("#emailErrorMsg").textContent = "";
   }
-});
 
-form.addEventListener('submit', function(e) {
-  e.preventDefault();
-  if (form.checkValidity()) {
-    alert('Le formulaire est valide.');
-  } else {
-    alert('Le formulaire n\'est pas valide. Veuillez vérifier les champs.');
-  }
-});
+  return isValid;
+}
 
-// --------------------------------------- PASSER COMMANDE -----------------------------------------------------
-
-// Création du contenu de la commande
 function createOrder() {
   let basketContents = [];
   for (let n = 0; n < cart.length; n++) {
     basketContents.push(cart[n].id);
   }
-  
+
   return {
-    contact : {
-      firstName : firstName.value,
-      lastName : lastName.value,
-      address : address.value,
-      city : city.value,
-      email : email.value,
+    contact: {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      email: email.value,
     },
-      products : basketContents
+    products: basketContents,
   };
 }
 
-// Click sur le bouton commande - requête Back-end
-
-const btnToOrder = document.querySelector("#order");
-btnToOrder.addEventListener("click", (e) => {
+form.addEventListener("submit", function (e) {
   e.preventDefault();
-  
   if (!cart || cart.length === 0) {
-    alert("Vous devez ajouter des produits dans votre panier");
-  } else {
+    alert("Vous devez ajouter au moins un produit dans votre panier");
+    return;
+  }
+  if (validateForm()) {
     const order = createOrder();
-    console.log(order)
+    console.log(order);
     fetch("http://localhost:3000/api/products/order", {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(order),
-      headers: { 
-        'Accept': 'application/json', 
-        'Content-Type': 'application/json' 
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     })
-    .then((response) => {
-      if (!response.ok || !form.checkValidity())  {
-        throw new Error("Vous devez remplir le formulaire correctement");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      alert("Commande passée avec succès !");
-      // Redirection de l'utilisateur vers la page de confirmation de commande
-      window.location.href = `./confirmation.html?id=${data.orderId}`;
-    })
-    .catch((error) => {
-      alert(error.message);
-    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Une erreur est survenue lors de la commande");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert("Commande passée avec succès !");
+        window.location.href = `./confirmation.html?id=${data.orderId}`;
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   }
 });
